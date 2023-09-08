@@ -49,10 +49,16 @@ class Calculator:
         ttk.Button(self.mainframe, text="/", command=lambda:self.opera("/")).grid(column=4, row=3, sticky=(E))
         ttk.Button(self.mainframe, text="=", command=lambda:self.opera("=")).grid(column=4, row=4, sticky=(E))
 
-
-
         self.result_window = ttk.Label(self.mainframe, textvariable=self.result_field, width=20, background="black", foreground= "white", relief="sunken")
         self.result_window.grid(column=1, row=0, sticky=(N,W,E,S))
+
+        #button for expand
+        self.expandcollapse = StringVar(value="Expand")
+        ttk.Button(self.mainframe, textvariable=self.expandcollapse, command=self.expand).grid(column=5, row=1)
+
+        self.modb = ttk.Button(self.mainframe, text="MOD", command=lambda:self.opera("%"))
+        self.powb = ttk.Button(self.mainframe, text="POW", command=lambda:self.opera("**"))
+        self.fdivb = ttk.Button(self.mainframe, text="FDIV", command=lambda:self.opera("//"))
 
 
     def button(self,val):
@@ -73,7 +79,7 @@ class Calculator:
 
 
     def opera(self, operator):
-        print(f"value={self.value}\noperator={self.operator}\nstatus={self.status}")
+        #print(f"value={self.value}\noperator={self.operator}\nstatus={self.status}")
         self.error_cl()
         if self.status == "i":
             self.value.append(float(self.result_field.get()))
@@ -90,7 +96,7 @@ class Calculator:
             self.status = "f"
         if operator != "=":
             self.operator = operator
-        print(f"out\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}")
+        #print(f"out\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}")
 
 
     def clear_all(self,setvalue):
@@ -103,6 +109,21 @@ class Calculator:
         if self.result_field.get() == "ER":
             self.result_field.set("0")
 
+    
+        #expand buttons cluster
+    
+    def expand(self):
+        
+        if self.expandcollapse.get() == "Expand":
+            self.modb.grid(column=6, row=0)
+            self.powb.grid(column=6, row=1)
+            self.fdivb.grid(column=6, row=2)
+            self.expandcollapse.set("Collapse")
+        else:
+            self.modb.grid_remove()
+            self.powb.grid_remove()
+            self.fdivb.grid_remove()
+            self.expandcollapse.set("Expand")
 
 
 
