@@ -6,19 +6,22 @@ class Calculator:
     def __init__(self,root):
         self.root = root
         self.root.title("CalculatorPy")
-
+        
+        #mainframe
         self.mainframe = ttk.Frame(root, padding = "3 12 3 3")
         self.mainframe.grid(column=0,row=0, sticky=(N,W,E,S))
 
+        #column and row configuration
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
 
+        #attributes
         self.value = []
         self.operator = None
         self.status = "i"
 
-
-
+        #style
+        
 
         #show an input filed and take input as a variable to show as label in next code block
         self.result_field = StringVar(value="0")
@@ -48,11 +51,12 @@ class Calculator:
 
 
 
-        self.result_window = ttk.Label(self.mainframe, textvariable=self.result_field, width=20)
+        self.result_window = ttk.Label(self.mainframe, textvariable=self.result_field, width=20, background="black", foreground= "white", relief="sunken")
         self.result_window.grid(column=1, row=0, sticky=(N,W,E,S))
 
 
     def button(self,val):
+        self.error_cl()
         if self.status == "w":
             self.result_field.set("")
             self.status = "i"
@@ -66,11 +70,19 @@ class Calculator:
 
 
     def opera(self, operator):
+        self.error_cl()
         if self.status == "i":
             self.value.append(float(self.result_field.get()))
             self.status = "w"
         if len(self.value) == 2 and self.operator:
-            self.value[0] = calculate(self.value[0], self.value.pop(), self.operator)
+            result = calculate(self.value[0], self.value.pop(), self.operator)
+            print(result)
+            print(self.value)
+            if result == "ee":
+                self.result_field.set("ER")
+                self.value = []
+                return
+            self.value[0] = result
             self.result_field.set(length_restrict(self.value[0]))
             self.operator = None
         if operator != "=":
@@ -78,9 +90,14 @@ class Calculator:
 
 
     def clear_all(self):
+        self.error_cl()
         self.value = []
         self.operator = None
         self.result_field.set("0")
+
+    def error_cl(self):
+        if self.result_field.get() == "ER":
+            self.result_field.set("0")
 
 
 

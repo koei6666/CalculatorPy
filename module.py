@@ -6,7 +6,12 @@ def calculate(a, b, operator):
         "+":ope.add,"-":ope.sub,"*":ope.mul,"/":ope.truediv,"//":ope.floordiv,"**":ope.pow,"%":ope.mod
     }
     func = funcdict[operator]
-    return conditional_round(func(a,b))
+    try:
+        result = conditional_round(func(a,b))
+    except:
+        result = "ee"
+
+    return result
 
 def conditional_round(value):
     if int(value) == value:
