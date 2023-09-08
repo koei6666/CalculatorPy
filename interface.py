@@ -41,7 +41,7 @@ class Calculator:
         ttk.Button(self.mainframe, text=".", command=lambda:self.button(".")).grid(column=1, row=4)
 
 
-        ttk.Button(self.mainframe, text="CA", command=self.clear_all).grid(column=5, row=0, sticky=(E))
+        ttk.Button(self.mainframe, text="CA", command=lambda:self.clear_all("0")).grid(column=5, row=0, sticky=(E))
 
         ttk.Button(self.mainframe, text="+", command=lambda:self.opera("+")).grid(column=4, row=0, sticky=(E))
         ttk.Button(self.mainframe, text="-", command=lambda:self.opera("-")).grid(column=4, row=1, sticky=(E))
@@ -57,12 +57,15 @@ class Calculator:
 
     def button(self,val):
         self.error_cl()
-        if self.status == "w":
+        if self.status == "f":
+            self.clear_all("")
+            self.status = "i"
+        elif self.status == "w":
             self.result_field.set("")
             self.status = "i"
         current = str(self.result_field.get())
         if len(current) < 12:
-            if current == "0":
+            if current == "0" and val != ".":
                 value = val
             else:
                 value = current + val
@@ -70,14 +73,13 @@ class Calculator:
 
 
     def opera(self, operator):
+        print(f"value={self.value}\noperator={self.operator}\nstatus={self.status}")
         self.error_cl()
         if self.status == "i":
             self.value.append(float(self.result_field.get()))
-            self.status = "w"
+        self.status = "w"
         if len(self.value) == 2 and self.operator:
             result = calculate(self.value[0], self.value.pop(), self.operator)
-            print(result)
-            print(self.value)
             if result == "ee":
                 self.result_field.set("ER")
                 self.value = []
@@ -85,15 +87,17 @@ class Calculator:
             self.value[0] = result
             self.result_field.set(length_restrict(self.value[0]))
             self.operator = None
+            self.status = "f"
         if operator != "=":
             self.operator = operator
+        print(f"out\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}")
 
 
-    def clear_all(self):
+    def clear_all(self,setvalue):
         self.error_cl()
         self.value = []
         self.operator = None
-        self.result_field.set("0")
+        self.result_field.set(setvalue)
 
     def error_cl(self):
         if self.result_field.get() == "ER":
