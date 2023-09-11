@@ -113,9 +113,12 @@ class Calculator:
         self.int = ttk.Button(self.mainframe, text="INT", command=lambda:self.converter("i"), style="specialbt1.TButton")
 
         #binary input mode
-        self.binary = ttk.Button(self.mainframe, text="BIN-M", command=lambda:self.bi_inputmode("b"), style="specialbt1.TButton")
+        self.binary = ttk.Button(self.mainframe, text="BIN-M", command=lambda:self.converter("i"), style="specialbt1.TButton")
         self.hex_warning = ttk.Label(self.mainframe, text="Input hexdecimal from your keyboard.")
 
+        #bit-wise operation
+        self.andop = ttk.Button(self.mainframe, text="&", command=lambda:self.converter("b"), style="specialbt1.TButton")
+ 
     def window_update(self, *args):
         self.display_window.set(self.operator_display.get().ljust(2) + self.result_field.get().rjust(38))
 
@@ -228,6 +231,7 @@ class Calculator:
             self.bin.grid(column=7, row=0)
             self.hex.grid(column=7, row=1)
             self.int.grid(column=7, row=2)
+            self.binary.grid(column=7, row=3)
             self.expandcollapse.set("Collapse")
         else:
             self.modb.grid_remove()
@@ -236,6 +240,7 @@ class Calculator:
             self.bin.grid_remove()
             self.hex.grid_remove()
             self.int.grid_remove()
+            self.binary.grid_remove()
             self.expandcollapse.set("Expand")
 
 

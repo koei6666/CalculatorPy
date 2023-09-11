@@ -35,7 +35,16 @@ def bitwiseop(op,a,b=None):
                 out += "1"
         return out
     if b:
-        range = min(len(a), len(b))
+        if len(a) > len(b):
+            b = b.zfill(len(a))
+        else:
+            a = a.zfill(len(b))
         if op == "&":
-            pass
+            y = len(a) - 1
+            while y >= 0:
+                if a[y] == "1" and b[y] == "1":
+                    out = "1" + out
+                else:
+                    out = "0" + out
+            return out
             
