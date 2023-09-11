@@ -24,3 +24,18 @@ def length_restrict(value):
     if len(value) > 11:
         return f"{float(value):.9e}"
     return value
+
+def bitwiseop(op,a,b=None):
+    out = ""
+    if op == "~":
+        for i in a:
+            if i == "1":
+                out += "0"
+            else:
+                out += "1"
+        return out
+    if b:
+        range = min(len(a), len(b))
+        if op == "&":
+            pass
+            
