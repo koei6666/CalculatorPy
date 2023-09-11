@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from module import calculate,length_restrict
+from module import calculate,length_restrict,bitwiseop
 
 class Calculator:
     def __init__(self,root):
@@ -205,6 +205,7 @@ class Calculator:
         for i in range(st,ed):
             self.numbers[i].state([set_to])
         self.numbers["."].state([set_to])
+
 
 
 
