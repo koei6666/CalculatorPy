@@ -117,28 +117,37 @@ class Calculator:
         self.hex_warning = ttk.Label(self.mainframe, text="Input hexdecimal from your keyboard.")
 
         #bit-wise operation
-        self.andop = ttk.Button(self.mainframe, text="&", command=lambda:self.converter("b"), style="specialbt1.TButton")
- 
+        self.andop = ttk.Button(self.mainframe, text="&", command=lambda:self.bitop("&"), style="specialbt1.TButton")
+        self.invertop = ttk.Button(self.mainframe, text="~", command=lambda:self.bitop("~"), style="specialbt1.TButton")
+
     def window_update(self, *args):
         self.display_window.set(self.operator_display.get().ljust(2) + self.result_field.get().rjust(38))
 
 
     def button(self,val):
-        #print(f"bt\nin\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}")
+        #print(f"bt\nin\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}\n")
         self.error_cl()
         if self.status == "f":
             self.clear_all("")
         elif self.status == "w":
             self.result_field.set("")
-        self.status = "i"
+
         current = str(self.result_field.get())
+
         if len(current) < 12:
             if current == "0" and val != ".":
                 value = val
             else:
+                if val == ".":
+                    if "." in current:
+                        self.status = "i"
+                        return
+                    elif self.status in "wf":
+                        current = "0"
                 value = current + val
             self.result_field.set(value)
-        #print(f"bt\nout\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}")
+            self.status = "i"
+        #print(f"bt\nout\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}\n")
 
 
     def opera(self, operator):
@@ -169,7 +178,6 @@ class Calculator:
 
     def converter(self,format_):
         conve_table = {"b":2,"x":16}
-        
         if self.mode == format_:
             return
         value = self.result_field.get()
@@ -194,17 +202,49 @@ class Calculator:
             set_to = "disabled"
             st, ed = 2, 10
             self.hex_warning.grid_remove()
+            #self.invertop.grid(column=8, row=0)
+            #self.andop.grid(column=8, row=1)
         elif mode == "i":
             set_to = "!disabled"
             st, ed = 0, 10
             self.hex_warning.grid_remove()
+            #self.invertop.grid_remove()
+            #self.andop.grid_remove()
         else:
             set_to = "disabled"
             st, ed = 0, 10
             self.hex_warning.grid(columnspan=7, row=4)
+            #self.invertop.grid_remove()
+            #self.andop.grid_remove()
         for i in range(st,ed):
             self.numbers[i].state([set_to])
         self.numbers["."].state([set_to])
+
+    def bitop(self,op):
+        print(f"bt\nin\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}\n")
+        self.status = "w"
+        if self.mode != "b":
+            self.converter("b")
+        current = self.result_field.get()
+        if op == "~":
+            inverted = [bitwiseop("~",current)]
+            self.result_field.set(inverted[0])
+            self.value = inverted
+            return
+        else:
+            self.value.append(current)
+            if len(self.value) == 3:
+                self.value = [bitwiseop(self.value[1],self.value[0],self.value[2])]
+                self.result_field.set(self.value[0])
+                print(f"bt\nout\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}\n")
+            if op != "=":
+                self.value.append(op)
+                print(f"bt\nout\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}\n")
+                return
+            self.value = []
+            print(f"bt\nout\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}\n")
+            return
+
 
 
 
@@ -232,7 +272,6 @@ class Calculator:
             self.bin.grid(column=7, row=0)
             self.hex.grid(column=7, row=1)
             self.int.grid(column=7, row=2)
-            self.binary.grid(column=7, row=3)
             self.expandcollapse.set("Collapse")
         else:
             self.modb.grid_remove()
@@ -241,7 +280,6 @@ class Calculator:
             self.bin.grid_remove()
             self.hex.grid_remove()
             self.int.grid_remove()
-            self.binary.grid_remove()
             self.expandcollapse.set("Expand")
 
 

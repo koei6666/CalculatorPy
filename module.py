@@ -46,5 +46,5 @@ def bitwiseop(op,a,b=None):
                     out = "1" + out
                 else:
                     out = "0" + out
+                y -= 1
             return out
-            
