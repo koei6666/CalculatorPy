@@ -177,6 +177,7 @@ class Calculator:
 
 
     def converter(self,format_):
+        self.error_cl()
         conve_table = {"b":2,"x":16}
         if self.mode == format_:
             return
@@ -189,7 +190,10 @@ class Calculator:
             elif self.mode == "x" and format_ == "b":
                 self.result_field.set(format(int(value,16), format_))
             else:
-                self.result_field.set(format(int(value), format_))
+                try:
+                    self.result_field.set(format(int(value), format_))
+                except:
+                    self.result_field.set("ER")
         self.bi_inputmode(format_)
         self.operator_display.set(format_)
 
@@ -259,7 +263,6 @@ class Calculator:
     def error_cl(self):
         if self.result_field.get() == "ER":
             self.result_field.set("0")
-
 
         #expand buttons cluster
 
