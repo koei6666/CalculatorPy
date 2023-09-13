@@ -6,9 +6,10 @@ class Calculator:
     def __init__(self,root):
         self.root = root
         self.root.title("CalculatorPy")
+        self.root.resizable(False,False)
 
 
-        #operator display dictionary
+        #dictionary
         self.operators = {
         "+":"+",
         "-":"-",
@@ -95,7 +96,7 @@ class Calculator:
         ttk.Button(self.mainframe, text="÷", command=lambda:self.opera("/"), style="operator_.TButton").grid(column=4, row=3, sticky=(E), ipady=ipadY_op)
         ttk.Button(self.mainframe, text="=", command=lambda:self.opera("="), style="operator_.TButton").grid(column=4, row=4, sticky=(E), ipady=ipadY_op)
 
-        self.result_window = ttk.Label(self.mainframe, textvariable=self.display_window, width=40, background="black", foreground= "white", relief="sunken", font=("Courier",12))
+        self.result_window = ttk.Label(self.mainframe, textvariable=self.display_window, width=27, background="black", foreground= "white", relief="sunken", font=("Courier",12))
         self.result_window.grid(columnspan=3, row=0, ipady=7)
 
         #button for expand
@@ -120,8 +121,8 @@ class Calculator:
         self.andop = ttk.Button(self.mainframe, text="&", command=lambda:self.bitop("&"), style="specialbt1.TButton")
         self.invertop = ttk.Button(self.mainframe, text="~", command=lambda:self.bitop("~"), style="specialbt1.TButton")
 
-    def window_update(self, *args):
-        self.display_window.set(self.operator_display.get().ljust(2) + self.result_field.get().rjust(38))
+    def window_update(self):
+        self.display_window.set(self.operator_display.get().ljust(2) + self.result_field.get().rjust(25))
 
 
     def button(self,val):
