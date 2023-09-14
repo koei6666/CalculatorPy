@@ -8,6 +8,37 @@ class Calculator:
         self.root.title("CalculatorPy")
         self.root.resizable(False,False)
 
+        #bind
+        self.keybind = {
+        "num":self.button,
+        "c":[self.clear_all,"0"],
+        "C":[self.clear_all,"0"],
+        "plus":[self.opera,"+"],
+        "minus":[self.opera,"-"],
+        "asterisk":[self.opera,"*"],
+        "slash":[self.opera,"/"],
+        "Return":[self.opera,"="],
+        ".":[self.button,"."],
+        "m":[self.opera,"%"],
+        "M":[self.opera,"%"],
+        "p":[self.opera,"**"],
+        "P":[self.opera,"**"],
+        "f":[self.opera,"//"],
+        "F":[self.opera,"//"],
+        "b":[self.converter,"b"],
+        "B":[self.converter,"b"],
+        "x":[self.converter,"x"],
+        "X":[self.converter,"x"],
+        "i":[self.converter,"i"],
+        "I":[self.converter,"I"],
+        }
+
+        #for number in range(0,10):
+        #    self.root.bind(f"<Key-{number}>", lambda event, n=number: self.button(str(n)))
+
+        #for key in self.keybind.keys():
+        #    self.root.bind(f"<Key-{key}>", lambda event, k=key: self.keybind[k][0](self.keybind[k][1]))
+        self.key_bind()
 
         #dictionary
         self.operators = {
@@ -35,6 +66,9 @@ class Calculator:
         self.operator = None
         self.status = "i"
         self.mode = "i"
+
+        #temp
+        #self.log = []
 
         #style
         st = ttk.Style()
@@ -95,6 +129,7 @@ class Calculator:
         ttk.Button(self.mainframe, text="×", command=lambda:self.opera("*"), style="operator_.TButton").grid(column=4, row=2, sticky=(E), ipady=ipadY_op)
         ttk.Button(self.mainframe, text="÷", command=lambda:self.opera("/"), style="operator_.TButton").grid(column=4, row=3, sticky=(E), ipady=ipadY_op)
         ttk.Button(self.mainframe, text="=", command=lambda:self.opera("="), style="operator_.TButton").grid(column=4, row=4, sticky=(E), ipady=ipadY_op)
+        ttk.Button(self.mainframe, text="←", command=lambda:self.backspace(), style="operator_.TButton").grid(column=5, row=4, sticky=(E), ipady=ipadY_op)
 
         self.result_window = ttk.Label(self.mainframe, textvariable=self.display_window, width=27, background="black", foreground= "white", relief="sunken", font=("Courier",12))
         self.result_window.grid(columnspan=3, row=0, ipady=7)
@@ -114,15 +149,45 @@ class Calculator:
         self.int = ttk.Button(self.mainframe, text="INT", command=lambda:self.converter("i"), style="specialbt1.TButton")
 
         #binary input mode
-        self.binary = ttk.Button(self.mainframe, text="BIN-M", command=lambda:self.converter("i"), style="specialbt1.TButton")
         self.hex_warning = ttk.Label(self.mainframe, text="Input hexdecimal from your keyboard.")
 
         #bit-wise operation
         self.andop = ttk.Button(self.mainframe, text="&", command=lambda:self.bitop("&"), style="specialbt1.TButton")
         self.invertop = ttk.Button(self.mainframe, text="~", command=lambda:self.bitop("~"), style="specialbt1.TButton")
 
-    def window_update(self):
+    def key_bind(self,st=None,ed=None,unbind=None):
+        keys = self.keybind.keys()
+        for index, key in enumerate(keys):
+            if index == 0:
+                continue
+            self.root.bind(f"<Key-{key}>", lambda event, k=key: self.keybind[k][0](self.keybind[k][1]))
+        if not unbind:
+            for number in range(0,10):
+                self.root.bind(f"<Key-{number}>", lambda event, n=number: self.keybind["num"](str(n)))
+        else:
+            for number in range(st,ed):
+                self.root.unbind(f"<Key-{number}>")
+            self.root.unbind("<Key-.")
+
+
+
+    def window_update(self, *args):
         self.display_window.set(self.operator_display.get().ljust(2) + self.result_field.get().rjust(25))
+
+
+    def keyboard(self,event):
+        key = event.keysym
+        self.display_window.set(key)
+
+    def backspace(self):
+        current = self.result_field.get()
+        if current != "0" and len(current) > 1:
+            current = current[:-1]
+        else:
+            current = "0"
+        self.result_field.set(current)
+
+
 
 
     def button(self,val):
@@ -203,27 +268,29 @@ class Calculator:
         self.mode = mode
         self.numbers[0].state(["!disabled"])
         self.numbers[1].state(["!disabled"])
+        self.key_bind()
         if mode == "b":
-            set_to = "disabled"
+            set_to = ("disabled",1)
             st, ed = 2, 10
             self.hex_warning.grid_remove()
             #self.invertop.grid(column=8, row=0)
             #self.andop.grid(column=8, row=1)
         elif mode == "i":
-            set_to = "!disabled"
+            set_to = ("!disabled",0)
             st, ed = 0, 10
             self.hex_warning.grid_remove()
             #self.invertop.grid_remove()
             #self.andop.grid_remove()
         else:
-            set_to = "disabled"
+            set_to = ("disabled",1)
             st, ed = 0, 10
             self.hex_warning.grid(columnspan=7, row=4)
             #self.invertop.grid_remove()
             #self.andop.grid_remove()
         for i in range(st,ed):
-            self.numbers[i].state([set_to])
-        self.numbers["."].state([set_to])
+            self.numbers[i].state([set_to[0]])
+            self.key_bind(st,ed,set_to[1])
+        self.numbers["."].state([set_to[0]])
 
     def bitop(self,op):
         print(f"bt\nin\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}\n")
