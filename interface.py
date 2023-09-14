@@ -30,14 +30,10 @@ class Calculator:
         "x":[self.converter,"x"],
         "X":[self.converter,"x"],
         "i":[self.converter,"i"],
-        "I":[self.converter,"I"],
+        "I":[self.converter,"I"]
         }
 
-        #for number in range(0,10):
-        #    self.root.bind(f"<Key-{number}>", lambda event, n=number: self.button(str(n)))
 
-        #for key in self.keybind.keys():
-        #    self.root.bind(f"<Key-{key}>", lambda event, k=key: self.keybind[k][0](self.keybind[k][1]))
         self.key_bind()
 
         #dictionary
@@ -68,7 +64,8 @@ class Calculator:
         self.mode = "i"
 
         #temp
-        #self.log = []
+        #self.root.bind("<Key>", self.keyboard)
+
 
         #style
         st = ttk.Style()
@@ -149,7 +146,7 @@ class Calculator:
         self.int = ttk.Button(self.mainframe, text="INT", command=lambda:self.converter("i"), style="specialbt1.TButton")
 
         #binary input mode
-        self.hex_warning = ttk.Label(self.mainframe, text="Input hexdecimal from your keyboard.")
+        self.hex_warning = ttk.Label(self.mainframe, text="Hexdecimal is for convertion only.")
 
         #bit-wise operation
         self.andop = ttk.Button(self.mainframe, text="&", command=lambda:self.bitop("&"), style="specialbt1.TButton")
@@ -157,6 +154,7 @@ class Calculator:
 
     def key_bind(self,st=None,ed=None,unbind=None):
         keys = self.keybind.keys()
+        self.root.bind("<Key-BackSpace>", lambda event:self.backspace())
         for index, key in enumerate(keys):
             if index == 0:
                 continue
