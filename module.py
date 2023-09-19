@@ -1,4 +1,5 @@
 import operator as ope
+#import traceback
 
 
 def calculate(a, b, operator):
@@ -6,12 +7,15 @@ def calculate(a, b, operator):
         "+":ope.add,"-":ope.sub,"*":ope.mul,"/":ope.truediv,"//":ope.floordiv,"**":ope.pow,"%":ope.mod
     }
     func = funcdict[operator]
+    str_a = str(conditional_round(a))
+    str_b = str(conditional_round(b))
     try:
         result = conditional_round(func(a,b))
+        history_text = str_a + operator + str_b + "=" + str(result)
     except:
         result = "ee"
-
-    return result
+        #traceback.print_exc()
+    return result, history_text
 
 def conditional_round(value):
     if int(value) == value:
