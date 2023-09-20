@@ -7,15 +7,15 @@ def calculate(a, b, operator):
         "+":ope.add,"-":ope.sub,"*":ope.mul,"/":ope.truediv,"//":ope.floordiv,"**":ope.pow,"%":ope.mod
     }
     func = funcdict[operator]
-    str_a = str(conditional_round(a))
-    str_b = str(conditional_round(b))
+    str_a = str(length_restrict(conditional_round(a)))
+    str_b = str(length_restrict(conditional_round(b)))
     try:
         result = conditional_round(func(a,b))
-        history_text = str_a + operator + str_b + "=" + str(result)
+        history_text = str_a + operator + str_b + "=" + str(length_restrict(result))
     except:
         result = "ee"
         #traceback.print_exc()
-    return result, history_text
+    return (result, history_text)
 
 def conditional_round(value):
     if int(value) == value:

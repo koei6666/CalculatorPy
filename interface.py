@@ -64,9 +64,13 @@ class Calculator:
         self.status = "i"
         self.mode = "i"
         self.history = deque()
+        self.hiwindow_ = None
+        self.scr_width = self.root.winfo_screenwidth()
+        self.scr_height = self.root.winfo_screenheight()
 
-        #temp
-        #self.root.bind("<Key>", self.keyboard)
+
+        #screen cordinate
+        self.root.geometry(f"+{int(0.15*self.scr_width)}+{int(0.2*self.scr_height)}")
 
 
         #style
@@ -79,7 +83,7 @@ class Calculator:
         st.configure("specialbt1.TButton", font=("Helvetica",9), background="firebrick1", width=8, foreground="black", borderwidth=5, focusthickness=1, focuscolor='white')
         st.map("specialbt1.TButton", background=[("pressed","darkorange")])
         st.configure("hexbt.TButton", font=("Courier",10), background="grey", foreground="black", width=4)
-        st.configure("history.TButton", relief="flat")
+        st.configure("history.TButton", relief="flat", font=("Courier",10), width=55, foreground="black")
         #style-button ipad
         ipadY = 5
         ipadY_op = 1
@@ -92,12 +96,6 @@ class Calculator:
         self.window_update()
         self.result_field.trace_add("write", self.window_update)
         self.operator_display.trace_add("write", self.window_update)
-        self.his_var1 = StringVar()
-        self.his_var2 = StringVar()
-        self.his_var3 = StringVar()
-        self.his_var4 = StringVar()
-        self.his_var_collection = {"hv1":self.his_var1, "hv2":self.his_var2, "hv3":self.his_var3, "hv4":self.his_var4}
-
 
         #button cluster 0-9
         self.one = ttk.Button(self.mainframe, text="1", command=lambda:self.button("1"), style="operator.TButton")
@@ -136,7 +134,7 @@ class Calculator:
         ttk.Button(self.mainframe, text="÷", command=lambda:self.opera("/"), style="operator_.TButton").grid(column=4, row=3, sticky=(E), ipady=ipadY_op)
         ttk.Button(self.mainframe, text="=", command=lambda:self.opera("="), style="operator_.TButton").grid(column=4, row=4, sticky=(E), ipady=ipadY_op)
         ttk.Button(self.mainframe, text="←", command=lambda:self.backspace(), style="operator_.TButton").grid(column=5, row=4, sticky=(E), ipady=ipadY_op)
-        ttk.Button(self.mainframe, text="←", command=history_window, style="operator_.TButton").grid(column=5, row=5, sticky=(E), ipady=ipadY_op)
+        ttk.Button(self.mainframe, text="History", command=self.hiwindow).grid(column=5, row=0, ipady=ipadY_op)
 
         self.result_window = ttk.Label(self.mainframe, textvariable=self.display_window, width=27, background="black", foreground= "white", relief="sunken", font=("Courier",12))
         self.result_window.grid(columnspan=3, row=0, ipady=7)
@@ -153,7 +151,7 @@ class Calculator:
         #converter
         self.bin = ttk.Button(self.mainframe, text="BIN", command=lambda:self.converter("b"), style="specialbt1.TButton")
         self.hex = ttk.Button(self.mainframe, text="HEX", command=lambda:self.converter("x"), style="specialbt1.TButton")
-        self.int = ttk.Button(self.mainframe, text="INT", command=lambda:self.converter("i"), style="specialbt1.TButton")
+        self.int = ttk.Button(self.mainframe, text="DEC", command=lambda:self.converter("i"), style="specialbt1.TButton")
 
         #binary input mode
         self.hex_warning = ttk.Label(self.mainframe, text="Hexdecimal is for convertion only.")
@@ -161,6 +159,7 @@ class Calculator:
         #bit-wise operation
         self.andop = ttk.Button(self.mainframe, text="&", command=lambda:self.bitop("&"), style="specialbt1.TButton")
         self.invertop = ttk.Button(self.mainframe, text="~", command=lambda:self.bitop("~"), style="specialbt1.TButton")
+
 
 
     def key_bind(self,st=None,ed=None,unbind=None):
@@ -233,14 +232,16 @@ class Calculator:
             self.value.append(float(self.result_field.get()))
         self.status = "w"
         if len(self.value) == 2 and self.operator:
-            result, history_text = calculate(self.value[0], self.value.pop(), self.operator)
-            self.history_display(history_text)
+            output = calculate(self.value[0], self.value.pop(), self.operator)
+            self.history.appendleft(output)
+            result = output[0]
             if result == "ee":
                 self.result_field.set("ER")
                 self.value = []
                 return
             self.value[0] = result
             self.result_field.set(length_restrict(self.value[0]))
+            self.history_refresh()
             self.operator = None
         if operator == "=":
             self.status = "f"
@@ -250,15 +251,6 @@ class Calculator:
         self.operator_display.set(self.operators[operator])
 
         #print(f"out\nvalue={self.value}\noperator={self.operator}\nstatus={self.status}")
-
-    def history_display(self,history):
-        if len(self.history) + 1 == 5:
-            self.history.pop()
-        self.history.appendleft(history)
-        for i in range(1,5):
-            key = f"hv{i}"
-            if len(self.history) >= i:
-                self.his_var_collection[key].set(self.history[i-1])
 
 
 
@@ -351,16 +343,6 @@ class Calculator:
             self.result_field.set("0")
 
         #expand buttons cluster
-
-
-    def history_window(self):
-        hiwindow = Toplevel()
-        hiwindow.title = "History"
-        hiwindow.config(width=70, height=120)
-        for i in range(len(self.history)):
-            ttk.Button(hiwindow, text=self.history[i], command=lambda:print("a"), style="history.TButton").grid(column=1, row=i)
-
-
     def expand(self):
 
         if self.expandcollapse.get() == "Expand":
@@ -381,11 +363,34 @@ class Calculator:
             self.int.grid_remove()
             self.expandcollapse.set("Expand")
 
-class history_window(Calculator):
-    def __init__(self):
-        self.hiwindow = Toplevel()
-        self.hiwindow.title = "History"
-        self.hiwindow.config(width=70, height=120)
+    def avaliablity_check(func):
+        def inner(self):
+            if self.hiwindow_ is not None and self.hiwindow_.winfo_exists():
+                return func(self)
+        return inner
+
+    @avaliablity_check
+    def history_refresh(self):
+        for i in range(len(self.history)):
+            ttk.Button(self.hiwindow_, style="history.TButton", text=self.history[i][1], command=lambda x=i:self.retrive(x)).grid(column=0, row=i+1)
+
+    def retrive(self,number):
+        result = self.history[number][0]
+        self.clear_all("")
+        self.value = [result]
+        self.result_field.set(str(result))
+
+
+    def hiwindow(self):
+        self.hiwindow_ = Toplevel(self.root)
+        self.hiwindow_.title = "History"
+        self.hiwindow_.geometry(f"+{int(0.5*self.scr_width)}+{int(0.2*self.scr_height)}")
+        st_h = ttk.Style()
+        st_h.theme_use('alt')
+        headline = "History".rjust(38," ")
+        ttk.Label(self.hiwindow_, text=headline, width=45, font=("Courier",12)).grid(column=0, row=0)
+        self.history_refresh()
+
 
 
 
