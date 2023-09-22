@@ -371,8 +371,14 @@ class Calculator:
 
     @avaliablity_check
     def history_refresh(self):
-        for i in range(len(self.history)):
+        if len(self.history) > 15:
+            self.history.pop()
+        length = len(self.history)
+        for i in range(length):
             ttk.Button(self.hiwindow_, style="history.TButton", text=self.history[i][1], command=lambda x=i:self.retrive(x)).grid(column=0, row=i+1)
+
+
+
 
     def retrive(self,number):
         result = self.history[number][0]
@@ -383,13 +389,17 @@ class Calculator:
 
     def hiwindow(self):
         self.hiwindow_ = Toplevel(self.root)
-        self.hiwindow_.title = "History"
+        self.hiwindow_.title("History")
         self.hiwindow_.geometry(f"+{int(0.5*self.scr_width)}+{int(0.2*self.scr_height)}")
+
         st_h = ttk.Style()
         st_h.theme_use('alt')
+
         headline = "History".rjust(38," ")
         ttk.Label(self.hiwindow_, text=headline, width=45, font=("Courier",12)).grid(column=0, row=0)
         self.history_refresh()
+
+
 
 
 
